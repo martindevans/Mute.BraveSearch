@@ -1,0 +1,9 @@
+launchSettings.json
+
+.vs
+
+Mute.BraveSearch/bin
+Mute.BraveSearch/obj
+
+Mute.BraveSearch.Terminal/bin
+Mute.BraveSearch.Terminal/obj

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Mute.BraveSearch.Terminal/Mute.BraveSearch.Terminal.csproj" />
+  <Project Path="Mute.BraveSearch/Mute.BraveSearch.csproj" />
+</Solution>
