@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Authors>Martin</Authors>
+    <Authors>Martin Evans</Authors>
     <Description>A .NET library for the Brave Search API.</Description>
     <PackageProjectUrl>https://github.com/martindev/Mute.BraveSearch</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
