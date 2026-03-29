@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Web;
@@ -36,10 +37,31 @@ public class BraveSearchClient
     }
 
     /// <inheritdoc />
-    public async Task<SearchResponse> SearchAsync(SearchRequest request, CancellationToken ct = default)
+    public Task<SearchResponse> SearchAsync(SearchRequest request, CancellationToken ct = default)
     {
-        var uri = BuildUri(request);
-        
+        return Request<SearchResponse>(
+            BuildSearchUri(request),
+            ct
+        );
+    }
+
+    /// <inheritdoc />
+    public async Task<NewsSearchResponse> NewsSearchAsync(string query, CancellationToken ct = default)
+    {
+        return await NewsSearchAsync(new NewsSearchRequest(query), ct);
+    }
+
+    /// <inheritdoc />
+    public Task<NewsSearchResponse> NewsSearchAsync(NewsSearchRequest request, CancellationToken ct = default)
+    {
+        return Request<NewsSearchResponse>(
+            BuildNewsUri(request),
+            ct
+        );
+    }
+
+    private async Task<T> Request<T>(string uri, CancellationToken ct)
+    {
         using var httpRequest = new HttpRequestMessage(HttpMethod.Get, uri);
         httpRequest.Headers.Add("Accept", "application/json");
         httpRequest.Headers.Add("x-subscription-token", _apiKey);
@@ -47,11 +69,33 @@ public class BraveSearchClient
         using var response = await _httpClient.SendAsync(httpRequest, ct);
         response.EnsureSuccessStatusCode();
 
-        var result = await response.Content.ReadFromJsonAsync<SearchResponse>(cancellationToken: ct);
-        return result ?? throw new JsonException("Failed to deserialize search response.");
+        var result = await response.Content.ReadFromJsonAsync<T>(
+            cancellationToken: ct
+        );
+
+        return result
+            ?? throw new JsonException("Failed to deserialize search response.");
     }
 
-    private static string BuildUri(SearchRequest request)
+    #region URI builders
+    private static string BuildSearchUri(SearchRequest request)
+    {
+        var query = BuildUriCommon(request);
+
+        if (request.ResultFilter != null && request.ResultFilter != ResultType.None)
+            query["result_filter"] = request.ResultFilter.Value.ToEnumMemberList().ToLowerInvariant();
+
+        return $"web/search?{query}";
+    }
+
+    private static string BuildNewsUri(NewsSearchRequest request)
+    {
+        var query = BuildUriCommon(request);
+
+        return $"news/search?{query}";
+    }
+
+    private static NameValueCollection BuildUriCommon(BaseSearchRequest request)
     {
         var query = HttpUtility.ParseQueryString(string.Empty);
         query["q"] = request.Query;
@@ -60,14 +104,14 @@ public class BraveSearchClient
             query["country"] = request.Country;
         if (request.SearchLang != null)
             query["search_lang"] = request.SearchLang;
-        if (request.Count != null) query["count"] = request.Count.Value.ToString();
-        if (request.Offset != null) query["offset"] = request.Offset.Value.ToString();
-        if (request.SafeSearch != null) query["safesearch"] = request.SafeSearch.Value.ToString().ToLowerInvariant();
-        if (request.Freshness != null) query["freshness"] = request.Freshness;
-
-        if (request.ResultFilter != null && request.ResultFilter != ResultType.None)
-            query["result_filter"] = request.ResultFilter.Value.ToString().Replace(" ", "").ToLowerInvariant();
-
+        if (request.Count != null)
+            query["count"] = request.Count.Value.ToString();
+        if (request.Offset != null)
+            query["offset"] = request.Offset.Value.ToString();
+        if (request.SafeSearch != null)
+            query["safesearch"] = request.SafeSearch.Value.ToString().ToLowerInvariant();
+        if (request.Freshness != null)
+            query["freshness"] = request.Freshness;
         if (request.Spellcheck != null)
             query["spellcheck"] = request.Spellcheck.Value.ToString().ToLowerInvariant();
         if (request.Goggles != null)
@@ -75,6 +119,7 @@ public class BraveSearchClient
         if (request.ExtraSnippets != null)
             query["extra_snippets"] = request.ExtraSnippets.Value.ToString().ToLowerInvariant();
 
-        return $"web/search?{query}";
+        return query;
     }
+    #endregion
 }

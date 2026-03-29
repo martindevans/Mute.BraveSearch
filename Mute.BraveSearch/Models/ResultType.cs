@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Mute.BraveSearch.Models;
@@ -68,4 +69,16 @@ public enum ResultType
     /// </summary>
     [JsonStringEnumMemberName("mixed")] 
     Mixed = 1 << 8
+}
+
+internal static class ResultTypeExtensions
+{
+    public static string ToEnumMemberList(this ResultType value)
+    {
+        return JsonSerializer
+            .Serialize(value)
+            .ToLowerInvariant()
+            .Replace(", ", ",")
+            .Replace("\"", "");
+    }
 }

@@ -173,8 +173,12 @@ public record Infobox([property: JsonPropertyName("type")] ResultType Type);
 
 /// <summary>News search results.</summary>
 /// <param name="Type">The result type.</param>
+/// <param name="Results">The list of news search results.</param>
 [UsedImplicitly]
-public record News([property: JsonPropertyName("type")] ResultType Type);
+public record News(
+    [property: JsonPropertyName("type")] ResultType Type,
+    [property: JsonPropertyName("results")] IReadOnlyList<NewsResult> Results
+);
 
 /// <summary>Video search results.</summary>
 /// <param name="Type">The result type.</param>

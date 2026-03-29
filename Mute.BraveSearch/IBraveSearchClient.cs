@@ -3,32 +3,107 @@ using Mute.BraveSearch.Models;
 namespace Mute.BraveSearch;
 
 /// <summary>
+/// Base class for all search request types
+/// </summary>
+public abstract record BaseSearchRequest
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="query">The search query (max 400 characters, 50 words)</param>
+    protected BaseSearchRequest(string query)
+    {
+        Query = query;
+    }
+
+    /// <summary>
+    /// The search query (max 400 characters, 50 words)
+    /// </summary>
+    public string Query { get; set; }
+
+    /// <summary>
+    /// 2-character country code (default: "US")
+    /// </summary>
+    public string? Country { get; set; }
+
+    /// <summary>
+    /// Language code for results (default: "en")
+    /// </summary>
+    public string? SearchLang { get; set; }
+
+    /// <summary>
+    /// Number of results, max 20 (default: 20)
+    /// </summary>
+    public int? Count { get; set; }
+
+    /// <summary>
+    /// Number of results to skip for pagination (max 9)
+    /// </summary>
+    public int? Offset { get; set; }
+
+    /// <summary>
+    /// Safe search setting
+    /// </summary>
+    public SafeSearch? SafeSearch { get; set; }
+
+    /// <summary>
+    /// ilter by age (e.g., pd, pw, or a date range)
+    /// </summary>
+    public string? Freshness { get; set; }
+
+    /// <summary>
+    /// Whether to enable spell check
+    /// </summary>
+    public bool? Spellcheck { get; set; }
+
+    /// <summary>
+    /// URL or definition for custom re-ranking
+    /// </summary>
+    public string? Goggles { get; set; }
+
+    /// <summary>
+    /// Whether to include extra snippets in results
+    /// </summary>
+    public bool? ExtraSnippets { get; set; }
+}
+
+/// <summary>
 /// A request for the Brave Search API.
 /// </summary>
-/// <param name="Query">The search query (max 400 characters, 50 words).</param>
-/// <param name="Country">2-character country code (default: "US").</param>
-/// <param name="SearchLang">Language code for results (default: "en").</param>
-/// <param name="Count">Number of results, max 20 (default: 20).</param>
-/// <param name="Offset">Number of results to skip for pagination (max 9).</param>
-/// <param name="SafeSearch">Safe search setting (off, moderate, or strict).</param>
-/// <param name="Freshness">Filter by age (e.g., pd, pw, or a date range).</param>
-/// <param name="ResultFilter">The flags for result types to include (e.g., web, news, videos).</param>
-/// <param name="Spellcheck">Whether to enable spell check (default: true).</param>
-/// <param name="Goggles">URL or definition for custom re-ranking.</param>
-/// <param name="ExtraSnippets">Whether to include extra snippets in results.</param>
-public record SearchRequest(
-    string Query,
-    string? Country = null,
-    string? SearchLang = null,
-    int? Count = null,
-    int? Offset = null,
-    SafeSearch? SafeSearch = null,
-    string? Freshness = null,
-    ResultType? ResultFilter = null,
-    bool? Spellcheck = null,
-    string? Goggles = null,
-    bool? ExtraSnippets = null
-);
+public record SearchRequest
+    : BaseSearchRequest
+{
+    /// <summary>
+    /// A request for the Brave Search API.
+    /// </summary>
+    public SearchRequest(string query, ResultType? filter = null)
+        : base(query)
+    {
+        ResultFilter = filter;
+    }
+
+    /// <summary>
+    /// The flags for result types to include
+    /// </summary>
+    public ResultType? ResultFilter { get; set; }
+}
+
+/// <summary>
+/// A request for the Brave News Search API.
+/// </summary>
+public record NewsSearchRequest
+    : BaseSearchRequest
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="query"></param>
+    public NewsSearchRequest(string query)
+        : base(query)
+    {
+        
+    }
+}
 
 /// <summary>
 /// A client for the Brave Search API.
@@ -44,4 +119,14 @@ public interface IBraveSearchClient
     /// Performs a simple search with only a query string.
     /// </summary>
     Task<SearchResponse> SearchAsync(string query, CancellationToken ct = default);
+
+    /// <summary>
+    /// Performs a news search with the specified request parameters.
+    /// </summary>
+    Task<NewsSearchResponse> NewsSearchAsync(NewsSearchRequest request, CancellationToken ct = default);
+
+    /// <summary>
+    /// Performs a simple news search with only a query string.
+    /// </summary>
+    Task<NewsSearchResponse> NewsSearchAsync(string query, CancellationToken ct = default);
 }

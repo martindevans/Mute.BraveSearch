@@ -34,16 +34,19 @@ while (true)
         {
             try
             {
-                var response = await client.SearchAsync(query);
+                var newsResponse = await client.NewsSearchAsync(new NewsSearchRequest(query)
+                {
+                    Country = "GB",
+                });
 
-                if (response.Web?.Results is { Count: > 0 })
+                if (newsResponse.Results is { Count: > 0 })
                 {
                     AnsiConsole.WriteLine();
-                    foreach (var result in response.Web.Results)
+                    foreach (var result in newsResponse.Results)
                     {
-                        AnsiConsole.Write(new Panel(result.Description)
+                        AnsiConsole.Write(new Panel(result.Description ?? "Null Description")
                         {
-                            Header = new PanelHeader($"[link={result.Url}]{Markup.Escape(result.Title)}[/]"),
+                            Header = new PanelHeader($"[link={result.Url}]{Markup.Escape(result.Title)}[/] (from {Markup.Escape(result.Profile?.Name ?? "null")})"),
                             Border = BoxBorder.Rounded,
                             Padding = new Padding(1, 0, 1, 0)
                         });
@@ -58,7 +61,7 @@ while (true)
                 }
                 else
                 {
-                    AnsiConsole.MarkupLine("[yellow]No results found.[/]");
+                    AnsiConsole.MarkupLine("[yellow]No news results found.[/]");
                 }
             }
             catch (Exception ex)
