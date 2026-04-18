@@ -111,7 +111,7 @@ public class BraveSearchClient
         if (request.SafeSearch != null)
             query["safesearch"] = request.SafeSearch.Value.ToString().ToLowerInvariant();
         if (request.Freshness != null)
-            query["freshness"] = request.Freshness;
+            query["freshness"] = request.Freshness.ToString();
         if (request.Spellcheck != null)
             query["spellcheck"] = request.Spellcheck.Value.ToString().ToLowerInvariant();
         if (request.Goggles != null)
