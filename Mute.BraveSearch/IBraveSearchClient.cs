@@ -121,6 +121,10 @@ public record SearchFreshness
     /// <returns></returns>
     public static SearchFreshness Range(DateOnly start, DateOnly end)
     {
+        // Ensure order is valid
+        if (end < start)
+            (start, end) = (end, start);
+        
         // 2022-04-01to2022-07-30
         return new SearchFreshness($"{start:O}to{end:O}");
     }
