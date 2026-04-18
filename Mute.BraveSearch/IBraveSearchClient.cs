@@ -70,8 +70,13 @@ public abstract record BaseSearchRequest
 /// <summary>
 /// Specifies the "freshness" of search results
 /// </summary>
-public record SearchFreshness
+public sealed record SearchFreshness
 {
+    private static readonly SearchFreshness _pd = new("pd");
+    private static readonly SearchFreshness _pw = new("pw");
+    private static readonly SearchFreshness _pm = new("pm");
+    private static readonly SearchFreshness _py = new("py");
+    
     private readonly string _value;
 
     private SearchFreshness(string value)
@@ -83,37 +88,25 @@ public record SearchFreshness
     /// Fetch results from last 24 hours
     /// </summary>
     /// <returns></returns>
-    public static SearchFreshness Day()
-    {
-        return new SearchFreshness("pd");
-    }
+    public static SearchFreshness Day() => _pd;
 
     /// <summary>
     /// Fetch results from last 7 days
     /// </summary>
     /// <returns></returns>
-    public static SearchFreshness Week()
-    {
-        return new SearchFreshness("pw");
-    }
+    public static SearchFreshness Week() => _pw;
 
     /// <summary>
     /// Fetch results from last month
     /// </summary>
     /// <returns></returns>
-    public static SearchFreshness Month()
-    {
-        return new SearchFreshness("pm");
-    }
+    public static SearchFreshness Month() => _pm;
 
     /// <summary>
     /// Fetch results from last year
     /// </summary>
     /// <returns></returns>
-    public static SearchFreshness Year()
-    {
-        return new SearchFreshness("py");
-    }
+    public static SearchFreshness Year() => _py;
 
     /// <summary>
     /// Fetch results from a specific date range
