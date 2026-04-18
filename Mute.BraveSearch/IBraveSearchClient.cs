@@ -47,9 +47,9 @@ public abstract record BaseSearchRequest
     public SafeSearch? SafeSearch { get; set; }
 
     /// <summary>
-    /// ilter by age (e.g., pd, pw, or a date range)
+    /// Filter by age (e.g., pd, pw, or a date range)
     /// </summary>
-    public string? Freshness { get; set; }
+    public SearchFreshness? Freshness { get; set; }
 
     /// <summary>
     /// Whether to enable spell check
@@ -65,6 +65,71 @@ public abstract record BaseSearchRequest
     /// Whether to include extra snippets in results
     /// </summary>
     public bool? ExtraSnippets { get; set; }
+}
+
+/// <summary>
+/// Specifies the "freshness" of search results
+/// </summary>
+public record SearchFreshness
+{
+    private readonly string _value;
+
+    private SearchFreshness(string value)
+    {
+        _value = value;
+    }
+    
+    /// <summary>
+    /// Fetch results from last 24 hours
+    /// </summary>
+    /// <returns></returns>
+    public static SearchFreshness Day()
+    {
+        return new SearchFreshness("pd");
+    }
+
+    /// <summary>
+    /// Fetch results from last 7 days
+    /// </summary>
+    /// <returns></returns>
+    public static SearchFreshness Week()
+    {
+        return new SearchFreshness("pw");
+    }
+
+    /// <summary>
+    /// Fetch results from last month
+    /// </summary>
+    /// <returns></returns>
+    public static SearchFreshness Month()
+    {
+        return new SearchFreshness("pm");
+    }
+
+    /// <summary>
+    /// Fetch results from last year
+    /// </summary>
+    /// <returns></returns>
+    public static SearchFreshness Year()
+    {
+        return new SearchFreshness("py");
+    }
+
+    /// <summary>
+    /// Fetch results from a specific date range
+    /// </summary>
+    /// <returns></returns>
+    public static SearchFreshness Range(DateOnly start, DateOnly end)
+    {
+        // 2022-04-01to2022-07-30
+        return new SearchFreshness($"{start:O}to{end:O}");
+    }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return _value;
+    }
 }
 
 /// <summary>
